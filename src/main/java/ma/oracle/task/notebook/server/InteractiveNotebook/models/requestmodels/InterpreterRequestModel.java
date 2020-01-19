@@ -1,5 +1,8 @@
 package ma.oracle.task.notebook.server.InteractiveNotebook.models.requestmodels;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class InterpreterRequestModel {
 
 	private String code;
