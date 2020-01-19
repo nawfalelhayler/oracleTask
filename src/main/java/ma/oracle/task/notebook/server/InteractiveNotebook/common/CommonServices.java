@@ -21,10 +21,13 @@ public class CommonServices {
 
 	private static final Logger LOGGER = Logger.getLogger(CommonServices.class.getName());
 	InterpreterResponseModel interpreterresponsemodel;
+	InterpreterRequestModel interpreterrequestmodel;
 
 	@Autowired
-	public CommonServices(InterpreterResponseModel interpreterresponsemodel) {
+	public CommonServices(InterpreterResponseModel interpreterresponsemodel,
+			InterpreterRequestModel interpreterrequestmodel) {
 		this.interpreterresponsemodel = interpreterresponsemodel;
+		this.interpreterrequestmodel = interpreterrequestmodel;
 	}
 
 	/*
@@ -41,6 +44,7 @@ public class CommonServices {
 				resultRegex = regexMatcher.group().replaceAll("^\\s+", "");
 			}
 		}
+		code.setCode(resultRegex);
 		return resultRegex;
 	}
 
@@ -48,10 +52,10 @@ public class CommonServices {
 	 * Function to create a script file base on the command thats will be sent to
 	 * the application
 	 */
-	public void createScript(String scriptLocation, InterpreterResponseModel interpreterresponsemodel)
+	public void createScript(String scriptLocation, InterpreterRequestModel interpreterrequestmodel)
 			throws IOException {
 		try (FileWriter myWriter = new FileWriter(scriptLocation)) {
-			myWriter.write(interpreterresponsemodel.getResult().replaceAll("^\\s+", ""));
+			myWriter.write(interpreterrequestmodel.getCode().replaceAll("^\\s+", ""));
 			LOGGER.log(Level.FINE, "Successfully wrote to the file.");
 		}
 	}
