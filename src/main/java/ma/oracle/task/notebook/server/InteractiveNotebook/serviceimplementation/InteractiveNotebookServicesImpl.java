@@ -28,7 +28,7 @@ public class InteractiveNotebookServicesImpl implements InteractiveNotebookServi
 			throws InterruptedException, IOException {
 		commonservices.commandRegex("\\s(.*)", interpreterrequestmodel);
 		commonservices.createScript("D:\\Microworkspace\\InteractiveNotebook\\script.py", interpreterrequestmodel);
-		String resultat = commonservices.executeScript("D:\\Microworkspace\\InteractiveNotebook\\script.py");
+		StringBuilder resultat = commonservices.executeScript("D:\\Microworkspace\\InteractiveNotebook\\script.py");
 		interpreterresponsemodel.setResult(resultat);
 		return interpreterresponsemodel;
 

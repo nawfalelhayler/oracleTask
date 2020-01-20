@@ -7,8 +7,6 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.*;
@@ -61,23 +59,24 @@ public class CommonServices {
 	}
 
 	/*
-	 * Function that excute the script sent by a user,the process of the interpreter
-	 * should be running and aded to the path
+	 * Function that execute the script sent by a user,the process of the interpreter
+	 * should be running and added to the path
 	 */
-	public String executeScript(String script) throws IOException, InterruptedException {
+	public StringBuilder executeScript(String script) throws IOException, InterruptedException {
 		Process p = Runtime.getRuntime().exec("python " + script);
-		String line;
+		StringBuilder resultScript = new StringBuilder();
 		p.waitFor();
 		BufferedReader error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-		error.close();
 		BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		line = input.readLine();
-		LOGGER.log(Level.FINE, "the response is: {0}", line);
-		OutputStream outputStream = p.getOutputStream();
-		PrintStream printStream = new PrintStream(outputStream);
-		printStream.println();
-		printStream.flush();
-		printStream.close();
-		return line;
+		String line;
+		while ((line = input.readLine()) != null) {
+			resultScript.append(line+ "\n");
+		}
+		
+		while((line=error.readLine()) != null) {
+			resultScript.append(line+ "\n");
+		}
+		
+		return resultScript;
 	}
 }

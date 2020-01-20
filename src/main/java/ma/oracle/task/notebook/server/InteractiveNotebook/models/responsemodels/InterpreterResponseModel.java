@@ -5,13 +5,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class InterpreterResponseModel {
 
-	private String result;
+	private StringBuilder result;
 
-	public String getResult() {
+	public StringBuilder getResult() {
 		return result;
 	}
 
-	public void setResult(String result) {
+	public void setResult(StringBuilder result) {
 		this.result = result;
 	}
 
