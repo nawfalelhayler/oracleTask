@@ -2,15 +2,17 @@ package ma.oracle.task.notebook.server.interactivenotebook.common;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ma.oracle.task.notebook.server.interactivenotebook.models.requestmodels.InterpreterRequestModel;
@@ -20,15 +22,8 @@ import ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels.
 public class CommonServices {
 
 	private static final Logger LOGGER = Logger.getLogger(CommonServices.class.getName());
-	InterpreterResponseModel interpreterresponsemodel;
-	InterpreterRequestModel interpreterrequestmodel;
-
-	@Autowired
-	public CommonServices(InterpreterResponseModel interpreterresponsemodel,
-			InterpreterRequestModel interpreterrequestmodel) {
-		this.interpreterresponsemodel = interpreterresponsemodel;
-		this.interpreterrequestmodel = interpreterrequestmodel;
-	}
+	InterpreterResponseModel interpreterresponsemodel = new InterpreterResponseModel();
+	InterpreterRequestModel interpreterrequestmodel = new InterpreterRequestModel();
 
 	/*
 	 * Function that takes the input and retrieve the command using Regex, the goal
@@ -64,10 +59,20 @@ public class CommonServices {
 	 * Function that execute the script sent by a user,the process of the
 	 * interpreter should be running and added to the path
 	 */
-	public StringBuilder executeScript(String script, InterpreterRequestModel interpreterrequestmodel) throws IOException, InterruptedException {
-		Process p = Runtime.getRuntime().exec("python " + script);
-		StringBuilder resultScript = new StringBuilder();
+	public StringBuilder executeScript(String script, InterpreterRequestModel interpreterrequestmodel)
+			throws IOException, InterruptedException {
+		// Insert in the file
+		BufferedWriter writer = new BufferedWriter(
+				new FileWriter("D:\\Microworkspace\\InteractiveNotebook\\ReusedScript.txt", true));
+		BufferedReader reader = new BufferedReader(
+				new FileReader("D:\\Microworkspace\\InteractiveNotebook\\ReusedScript.txt"));
+		writer.append(interpreterrequestmodel.getCode() + "\r\n");
+		writer.close();
+		// Execute All the file
+		Process p = Runtime.getRuntime().exec("python D:\\Microworkspace\\InteractiveNotebook\\ReusedScript.txt");
+		// Process p =Runtime.getRuntime().exec("python " + script);
 		p.waitFor();
+		StringBuilder resultScript = new StringBuilder();
 		BufferedReader error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 		BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		String line;
@@ -78,12 +83,6 @@ public class CommonServices {
 		while ((line = error.readLine()) != null) {
 			resultScript.append(line + "\n");
 		}
-		if (resultScript.length() == 0) {
-			BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\Microworkspace\\InteractiveNotebook\\ReusedScript.txt",true));
-			writer.append(interpreterrequestmodel.getCode()+"\n");
-			writer.close();
-		}
 		return resultScript;
 	}
-
 }

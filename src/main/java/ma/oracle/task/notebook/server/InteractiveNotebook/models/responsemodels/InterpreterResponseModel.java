@@ -1,8 +1,6 @@
 package ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels;
 
-import org.springframework.stereotype.Component;
 
-@Component
 public class InterpreterResponseModel {
 
 	private StringBuilder result;
