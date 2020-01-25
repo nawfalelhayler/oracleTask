@@ -1,4 +1,4 @@
-package ma.oracle.task.notebook.server.InteractiveNotebook.models.responsemodels;
+package ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels;
 
 import org.springframework.stereotype.Component;
 

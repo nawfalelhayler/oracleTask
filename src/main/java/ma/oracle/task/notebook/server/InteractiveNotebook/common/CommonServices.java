@@ -1,18 +1,20 @@
-package ma.oracle.task.notebook.server.InteractiveNotebook.common;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+package ma.oracle.task.notebook.server.interactivenotebook.common;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import ma.oracle.task.notebook.server.InteractiveNotebook.models.requestmodels.InterpreterRequestModel;
-import ma.oracle.task.notebook.server.InteractiveNotebook.models.responsemodels.InterpreterResponseModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import ma.oracle.task.notebook.server.interactivenotebook.models.requestmodels.InterpreterRequestModel;
+import ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels.InterpreterResponseModel;
 
 @Component
 public class CommonServices {
@@ -59,10 +61,10 @@ public class CommonServices {
 	}
 
 	/*
-	 * Function that execute the script sent by a user,the process of the interpreter
-	 * should be running and added to the path
+	 * Function that execute the script sent by a user,the process of the
+	 * interpreter should be running and added to the path
 	 */
-	public StringBuilder executeScript(String script) throws IOException, InterruptedException {
+	public StringBuilder executeScript(String script, InterpreterRequestModel interpreterrequestmodel) throws IOException, InterruptedException {
 		Process p = Runtime.getRuntime().exec("python " + script);
 		StringBuilder resultScript = new StringBuilder();
 		p.waitFor();
@@ -70,13 +72,18 @@ public class CommonServices {
 		BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		String line;
 		while ((line = input.readLine()) != null) {
-			resultScript.append(line+ "\n");
+			resultScript.append(line + "\n");
 		}
-		
-		while((line=error.readLine()) != null) {
-			resultScript.append(line+ "\n");
+
+		while ((line = error.readLine()) != null) {
+			resultScript.append(line + "\n");
 		}
-		
+		if (resultScript.length() == 0) {
+			BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\Microworkspace\\InteractiveNotebook\\ReusedScript.txt",true));
+			writer.append(interpreterrequestmodel.getCode()+"\n");
+			writer.close();
+		}
 		return resultScript;
 	}
+
 }

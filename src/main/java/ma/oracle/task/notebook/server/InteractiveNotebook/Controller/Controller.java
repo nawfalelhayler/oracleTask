@@ -1,4 +1,4 @@
-package ma.oracle.task.notebook.server.InteractiveNotebook.Controller;
+package ma.oracle.task.notebook.server.interactivenotebook.Controller;
 
 import java.io.IOException;
 
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ma.oracle.task.notebook.server.InteractiveNotebook.models.requestmodels.InterpreterRequestModel;
-import ma.oracle.task.notebook.server.InteractiveNotebook.models.responsemodels.InterpreterResponseModel;
-import ma.oracle.task.notebook.server.InteractiveNotebook.service.InteractiveNotebookServices;
+import ma.oracle.task.notebook.server.interactivenotebook.models.requestmodels.InterpreterRequestModel;
+import ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels.InterpreterResponseModel;
+import ma.oracle.task.notebook.server.interactivenotebook.service.InteractiveNotebookServices;
 
 @RestController
 @RequestMapping("/interpreter")

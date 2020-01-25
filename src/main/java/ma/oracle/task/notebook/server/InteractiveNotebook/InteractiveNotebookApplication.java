@@ -1,4 +1,4 @@
-package ma.oracle.task.notebook.server.InteractiveNotebook;
+package ma.oracle.task.notebook.server.interactivenotebook;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

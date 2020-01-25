@@ -1,4 +1,4 @@
-package ma.oracle.task.notebook.server.InteractiveNotebook.exceptions;
+package ma.oracle.task.notebook.server.interactivenotebook.exceptions;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
