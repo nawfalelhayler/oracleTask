@@ -3,6 +3,8 @@ package ma.oracle.task.notebook.server.interactivenotebook.serviceimplementation
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import ma.oracle.task.notebook.server.interactivenotebook.common.CommonServices;
@@ -11,25 +13,27 @@ import ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels.
 import ma.oracle.task.notebook.server.interactivenotebook.service.InteractiveNotebookServices;
 
 @Service
+@PropertySource("classpath:bootstrap.properties")
 public class InteractiveNotebookServicesImpl implements InteractiveNotebookServices {
 
-	InterpreterResponseModel interpreterresponsemodel;
+	InterpreterResponseModel interpreterresponsemodel = new InterpreterResponseModel();
 	CommonServices commonservices;
+	@Value("${path.file.used}")
+	String pathToFile;
 
 	@Autowired
-	public InteractiveNotebookServicesImpl(InterpreterResponseModel interpreterresponsemodel,
-			CommonServices commonservice) {
-		this.interpreterresponsemodel = interpreterresponsemodel;
+	public InteractiveNotebookServicesImpl(CommonServices commonservice) {
 		this.commonservices = commonservice;
 	}
 
 	@Override
 	public InterpreterResponseModel executecommand(InterpreterRequestModel interpreterrequestmodel)
 			throws InterruptedException, IOException {
-		commonservices.commandRegex("\\s(.*)", interpreterrequestmodel);
-		commonservices.createScript("D:\\Microworkspace\\InteractiveNotebook\\script.py", interpreterrequestmodel);
-		StringBuilder resultat = commonservices.executeScript("D:\\Microworkspace\\InteractiveNotebook\\script.py",interpreterrequestmodel);
-		interpreterresponsemodel.setResult(resultat);
+		// Taking the command by removing %<interpreterName><whitespace> using regex
+		// pattern
+		commonservices.commandRegex(interpreterrequestmodel);
+		StringBuilder result = commonservices.executeScript(pathToFile, interpreterrequestmodel);
+		interpreterresponsemodel.setResult(result);
 		return interpreterresponsemodel;
 
 	}
