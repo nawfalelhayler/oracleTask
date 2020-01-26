@@ -22,17 +22,16 @@ import ma.oracle.task.notebook.server.interactivenotebook.models.requestmodels.I
 import ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels.InterpreterResponseModel;
 
 @Component
-@PropertySource("classpath:bootstrap.properties")
 public class CommonServices {
 
 	private static final Logger LOGGER = Logger.getLogger(CommonServices.class.getName());
 	InterpreterResponseModel interpreterresponsemodel = new InterpreterResponseModel();
 	InterpreterRequestModel interpreterrequestmodel = new InterpreterRequestModel();
-	@Value("${path.file.used}")
-	String pathToFile;
-	
+	String pathToFile=System.getProperty("user.dir")+"\\src\\main\\resources\\scripts\\script.txt";
+
 	/*
-	 * This method is for deleting the script file reserved to a user after the application startup
+	 * This method is for deleting the script file reserved to a user after the
+	 * application startup
 	 */
 	@PostConstruct
 	public void init() {
@@ -43,6 +42,20 @@ public class CommonServices {
 		} else {
 			LOGGER.log(Level.WARNING, "Failed to delete the script file");
 		}
+	}
+
+	public String retrieveInterpreter(InterpreterRequestModel code) {
+		String interpreter = null;
+		String request = code.getCode();
+		Pattern checkRegex = Pattern.compile("^%[a-zA-Z]*");
+		Matcher regexMatcher = checkRegex.matcher(request);
+		while (regexMatcher.find()) {
+			if (regexMatcher.group().length() != 0) {
+				interpreter = regexMatcher.group().replace("%", "");
+			}
+		}
+		return interpreter;
+
 	}
 
 	/*
@@ -67,17 +80,17 @@ public class CommonServices {
 	 * Function that execute the script sent by a user,the process of the
 	 * interpreter should be running and added to the path
 	 */
-	public StringBuilder executeScript(String script, InterpreterRequestModel interpreterrequestmodel)
+	public StringBuilder executeScript(String interpreter, InterpreterRequestModel interpreterrequestmodel)
 			throws IOException, InterruptedException {
 		// Insert in the file
-		BufferedWriter writer = new BufferedWriter(new FileWriter(script, true));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(pathToFile, true));
 		writer.append(interpreterrequestmodel.getCode() + "\r\n");
 		writer.close();
 		// Execute All the file
-		Process p = Runtime.getRuntime().exec("python " + script);
+		Process p = Runtime.getRuntime().exec(interpreter+" " +pathToFile);
 		p.waitFor();
 		StringBuilder resultScript = new StringBuilder();
-		//Taking the error sent by the process
+		// Taking the error sent by the process
 		String line;
 		BufferedReader error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 		while ((line = error.readLine()) != null) {
@@ -89,11 +102,11 @@ public class CommonServices {
 			resultScript.append(line + "\n");
 		}
 
-		//Control if the code is to be reused or not , ie: affectation or an import etc
+		// Control if the code is to be reused or not , ie: affectation or an import etc
 		if (resultScript.length() != 0) {
 			RandomAccessFile raf = null;
 			try {
-				raf = new RandomAccessFile(script, "rw");
+				raf = new RandomAccessFile(pathToFile, "rw");
 				raf.seek(0);
 				raf.setLength(raf.length() - interpreterrequestmodel.getCode().length() - 2);
 			} catch (Exception e) {

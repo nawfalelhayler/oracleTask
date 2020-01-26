@@ -3,8 +3,6 @@ package ma.oracle.task.notebook.server.interactivenotebook.serviceimplementation
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import ma.oracle.task.notebook.server.interactivenotebook.common.CommonServices;
@@ -13,13 +11,10 @@ import ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels.
 import ma.oracle.task.notebook.server.interactivenotebook.service.InteractiveNotebookServices;
 
 @Service
-@PropertySource("classpath:bootstrap.properties")
 public class InteractiveNotebookServicesImpl implements InteractiveNotebookServices {
 
 	InterpreterResponseModel interpreterresponsemodel = new InterpreterResponseModel();
 	CommonServices commonservices;
-	@Value("${path.file.used}")
-	String pathToFile;
 
 	@Autowired
 	public InteractiveNotebookServicesImpl(CommonServices commonservice) {
@@ -33,14 +28,15 @@ public class InteractiveNotebookServicesImpl implements InteractiveNotebookServi
 		 * Taking the command by removing %<interpreterName><whitespace> using regex
 		 * pattern
 		 */
+		String interpreter = commonservices.retrieveInterpreter(interpreterrequestmodel);
 		commonservices.commandRegex(interpreterrequestmodel);
+		
 		/*
 		 * Executing the Script created in the pathTofile ( the value of this variable
 		 * is outsourced in bootstrap.properties
 		 */
-		StringBuilder result = commonservices.executeScript(pathToFile, interpreterrequestmodel);
+		StringBuilder result = commonservices.executeScript(interpreter,  interpreterrequestmodel);
 		interpreterresponsemodel.setResult(result);
 		return interpreterresponsemodel;
-
 	}
 }
