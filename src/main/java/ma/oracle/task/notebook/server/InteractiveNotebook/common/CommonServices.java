@@ -30,7 +30,10 @@ public class CommonServices {
 	InterpreterRequestModel interpreterrequestmodel = new InterpreterRequestModel();
 	@Value("${path.file.used}")
 	String pathToFile;
-
+	
+	/*
+	 * This method is for deleting the script file reserved to a user after the application startup
+	 */
 	@PostConstruct
 	public void init() {
 		File file = new File(pathToFile);
@@ -74,16 +77,19 @@ public class CommonServices {
 		Process p = Runtime.getRuntime().exec("python " + script);
 		p.waitFor();
 		StringBuilder resultScript = new StringBuilder();
-		BufferedReader error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-		BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		//Taking the error sent by the process
 		String line;
+		BufferedReader error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		while ((line = error.readLine()) != null) {
+			resultScript.append(line + "\n");
+		}
+		// Taking the response sent by the process
+		BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		while ((line = input.readLine()) != null) {
 			resultScript.append(line + "\n");
 		}
 
-		while ((line = error.readLine()) != null) {
-			resultScript.append(line + "\n");
-		}
+		//Control if the code is to be reused or not , ie: affectation or an import etc
 		if (resultScript.length() != 0) {
 			RandomAccessFile raf = null;
 			try {

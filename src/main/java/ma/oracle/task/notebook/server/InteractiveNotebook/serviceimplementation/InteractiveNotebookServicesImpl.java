@@ -29,9 +29,15 @@ public class InteractiveNotebookServicesImpl implements InteractiveNotebookServi
 	@Override
 	public InterpreterResponseModel executecommand(InterpreterRequestModel interpreterrequestmodel)
 			throws InterruptedException, IOException {
-		// Taking the command by removing %<interpreterName><whitespace> using regex
-		// pattern
+		/*
+		 * Taking the command by removing %<interpreterName><whitespace> using regex
+		 * pattern
+		 */
 		commonservices.commandRegex(interpreterrequestmodel);
+		/*
+		 * Executing the Script created in the pathTofile ( the value of this variable
+		 * is outsourced in bootstrap.properties
+		 */
 		StringBuilder result = commonservices.executeScript(pathToFile, interpreterrequestmodel);
 		interpreterresponsemodel.setResult(result);
 		return interpreterresponsemodel;

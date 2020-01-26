@@ -1,6 +1,5 @@
 package ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels;
 
-
 public class InterpreterResponseModel {
 
 	private StringBuilder result;
