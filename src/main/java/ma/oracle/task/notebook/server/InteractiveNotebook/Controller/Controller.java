@@ -1,4 +1,4 @@
-package ma.oracle.task.notebook.server.interactivenotebook.Controller;
+package ma.oracle.task.notebook.server.interactivenotebook.controller;
 
 import java.io.IOException;
 
