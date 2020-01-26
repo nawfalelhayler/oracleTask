@@ -1,5 +1,7 @@
 package ma.oracle.task.notebook.server.interactivenotebook.exceptions;
 
+import java.util.Date;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,4 +18,10 @@ public class InteractiveNotebookExceptionHandler extends ResponseEntityException
 		return new ResponseEntity<>(ex, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	@ExceptionHandler(value = { InterpreterNotKnownException.class })
+	public ResponseEntity<Object> handleInterpreterNotKnownException(InterpreterNotKnownException ex, WebRequest request) {
+
+		ErrorMessage errormessage = new ErrorMessage(new Date(), ex.getLocalizedMessage());
+		return new ResponseEntity<>(errormessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }

@@ -14,10 +14,9 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
+import ma.oracle.task.notebook.server.interactivenotebook.exceptions.InterpreterNotKnownException;
 import ma.oracle.task.notebook.server.interactivenotebook.models.requestmodels.InterpreterRequestModel;
 import ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels.InterpreterResponseModel;
 
@@ -53,6 +52,10 @@ public class CommonServices {
 			if (regexMatcher.group().length() != 0) {
 				interpreter = regexMatcher.group().replace("%", "");
 			}
+		}
+		if(!interpreter.equals("python")) {
+			throw new InterpreterNotKnownException("InterpreterNotKnownException: the interpreter is not handled by the application");
+			
 		}
 		return interpreter;
 
