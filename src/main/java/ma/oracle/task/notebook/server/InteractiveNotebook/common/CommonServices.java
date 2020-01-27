@@ -21,12 +21,18 @@ import ma.oracle.task.notebook.server.interactivenotebook.exceptions.Interpreter
 import ma.oracle.task.notebook.server.interactivenotebook.models.requestmodels.InterpreterRequestModel;
 import ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels.InterpreterResponseModel;
 
+/*
+ * This class contains small methods that will be called by the service implementation class
+ */
 @Component
 public class CommonServices {
 
 	private static final Logger LOGGER = Logger.getLogger(CommonServices.class.getName());
 	InterpreterResponseModel interpreterresponsemodel = new InterpreterResponseModel();
 	InterpreterRequestModel interpreterrequestmodel = new InterpreterRequestModel();
+	/*
+	 * the path where we will Store the script sent by the user and execute it
+	 */
 	String pathToFile = System.getProperty("user.dir") + "\\src\\main\\resources\\scripts\\script.txt";
 
 	/*
@@ -44,9 +50,23 @@ public class CommonServices {
 		}
 	}
 
-	public String retrieveInterpreter(InterpreterRequestModel code) {
+	/*
+	 * retrieve the interpreter from the request and checking if the request is in
+	 * the correct form plus if the interpreter is handled by the application
+	 */
+	public String retrieveInterpreter(InterpreterRequestModel requestmodel) {
 		String interpreter = null;
-		String request = code.getCode();
+		String request = requestmodel.getCode();
+		/*
+		 * Control if the request is in the correct form
+		 */
+		if (!Pattern.matches("^\\%[^\\s]+[ ].*", request)) {
+			throw new CodeCannotBeParsedException(
+					"CodeCannotBeParsedException: Wrong request form, please make sure the request follow the following form : %<interpreter-name><whitespace><code>");
+		}
+		/*
+		 * Taking the interpreter from the request
+		 */
 		Pattern checkRegex = Pattern.compile("^%[a-zA-Z]*");
 		Matcher regexMatcher = checkRegex.matcher(request);
 		while (regexMatcher.find()) {
@@ -54,6 +74,11 @@ public class CommonServices {
 				interpreter = regexMatcher.group().replace("%", "");
 			}
 		}
+		/*
+		 * Control if the interpreter is supported by the application, he idea is to
+		 * have a map where we will store all the interpreter supported by the app and
+		 * check if the interpreter exist in the map or not
+		 */
 		if (!interpreter.equals("python")) {
 			throw new InterpreterNotKnownException(
 					"InterpreterNotKnownException: the interpreter is not handled by the application");
@@ -70,10 +95,6 @@ public class CommonServices {
 	public String commandRegex(InterpreterRequestModel code) {
 		String resultRegex = null;
 		String command = code.getCode();
-		if (!Pattern.matches("^\\%[^\\s]+[ ].*", command)) {
-			throw new CodeCannotBeParsedException(
-					"CodeCannotBeParsedException: Wrong request form, please make sure the request follow the following from : %<interpreter-name><whitespace><code>");
-		}
 		Pattern checkRegex = Pattern.compile("\\s(.*)");
 		Matcher regexMatcher = checkRegex.matcher(command);
 		while (regexMatcher.find()) {
@@ -110,13 +131,17 @@ public class CommonServices {
 			resultScript.append(line + "\n");
 		}
 
-		// Control if the code is to be reused or not , ie: affectation or an import etc
+		/*
+		 * Control if the code is to be reused or not , ie: affectation or an import etc
+		 * if the code is to be reused we stored it in the file dedicated to the user ,
+		 * if not we remove it by truncating the script file
+		 */
 		if (resultScript.length() != 0) {
 			RandomAccessFile raf = null;
 			try {
 				raf = new RandomAccessFile(pathToFile, "rw");
 				raf.seek(0);
-				raf.setLength(raf.length() - interpreterrequestmodel.getCode().length() - 2);
+				raf.setLength(raf.length() - codeToBeExecuted.length() - 2);
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {

@@ -29,15 +29,18 @@ public class InteractiveNotebookServicesImpl implements InteractiveNotebookServi
 		 */
 		String interpreter = commonservices.retrieveInterpreter(interpreterrequestmodel);
 		/*
-		 * Taking the command by removing %<interpreterName><whitespace> using regex
+		 * Taking the code to be executed by removing %<interpreterName><whitespace> using regex
 		 * pattern
 		 */
 		String codeToBeExecuted = commonservices.commandRegex(interpreterrequestmodel);
 
 		/*
-		 * Executing the Script created
+		 * Executing the code
 		 */
 		StringBuilder result = commonservices.executeScript(interpreter, codeToBeExecuted);
+		/*
+		 * setting the result in the response model
+		 */
 		interpreterresponsemodel.setResult(result);
 		return interpreterresponsemodel;
 	}

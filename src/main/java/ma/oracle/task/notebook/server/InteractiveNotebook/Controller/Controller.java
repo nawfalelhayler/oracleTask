@@ -15,7 +15,7 @@ import ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels.
 import ma.oracle.task.notebook.server.interactivenotebook.service.InteractiveNotebookServices;
 
 @RestController
-@RequestMapping("/interpreter")
+@RequestMapping
 public class Controller {
 
 	@Autowired
@@ -26,5 +26,4 @@ public class Controller {
 			throws InterruptedException, IOException {
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(interactivenotebookservices.executecommand(command));
 	}
-
 }
