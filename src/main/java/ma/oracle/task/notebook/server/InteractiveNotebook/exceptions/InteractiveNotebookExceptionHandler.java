@@ -25,7 +25,7 @@ public class InteractiveNotebookExceptionHandler extends ResponseEntityException
 		return new ResponseEntity<>(errormessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@ExceptionHandler(value = { InterpreterNotKnownException.class })
+	@ExceptionHandler(value = { CodeCannotBeParsedException.class })
 	public ResponseEntity<Object> handleCodeCannotBeParsedException(CodeCannotBeParsedException ex, WebRequest request) {
 
 		ErrorMessage errormessage = new ErrorMessage(new Date(), ex.getLocalizedMessage());

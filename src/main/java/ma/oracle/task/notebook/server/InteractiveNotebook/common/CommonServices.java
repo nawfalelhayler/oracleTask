@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Component;
 
+import ma.oracle.task.notebook.server.interactivenotebook.exceptions.CodeCannotBeParsedException;
 import ma.oracle.task.notebook.server.interactivenotebook.exceptions.InterpreterNotKnownException;
 import ma.oracle.task.notebook.server.interactivenotebook.models.requestmodels.InterpreterRequestModel;
 import ma.oracle.task.notebook.server.interactivenotebook.models.responsemodels.InterpreterResponseModel;
@@ -26,7 +27,7 @@ public class CommonServices {
 	private static final Logger LOGGER = Logger.getLogger(CommonServices.class.getName());
 	InterpreterResponseModel interpreterresponsemodel = new InterpreterResponseModel();
 	InterpreterRequestModel interpreterrequestmodel = new InterpreterRequestModel();
-	String pathToFile=System.getProperty("user.dir")+"\\src\\main\\resources\\scripts\\script.txt";
+	String pathToFile = System.getProperty("user.dir") + "\\src\\main\\resources\\scripts\\script.txt";
 
 	/*
 	 * This method is for deleting the script file reserved to a user after the
@@ -53,9 +54,10 @@ public class CommonServices {
 				interpreter = regexMatcher.group().replace("%", "");
 			}
 		}
-		if(!interpreter.equals("python")) {
-			throw new InterpreterNotKnownException("InterpreterNotKnownException: the interpreter is not handled by the application");
-			
+		if (!interpreter.equals("python")) {
+			throw new InterpreterNotKnownException(
+					"InterpreterNotKnownException: the interpreter is not handled by the application");
+
 		}
 		return interpreter;
 
@@ -68,6 +70,10 @@ public class CommonServices {
 	public String commandRegex(InterpreterRequestModel code) {
 		String resultRegex = null;
 		String command = code.getCode();
+		if (!Pattern.matches("^\\%[^\\s]+[ ].*", command)) {
+			throw new CodeCannotBeParsedException(
+					"CodeCannotBeParsedException: Wrong request form, please make sure the request follow the following from : %<interpreter-name><whitespace><code>");
+		}
 		Pattern checkRegex = Pattern.compile("\\s(.*)");
 		Matcher regexMatcher = checkRegex.matcher(command);
 		while (regexMatcher.find()) {
@@ -75,7 +81,6 @@ public class CommonServices {
 				resultRegex = regexMatcher.group().replaceAll("^\\s+", "");
 			}
 		}
-		code.setCode(resultRegex);
 		return resultRegex;
 	}
 
@@ -83,14 +88,14 @@ public class CommonServices {
 	 * Function that execute the script sent by a user,the process of the
 	 * interpreter should be running and added to the path
 	 */
-	public StringBuilder executeScript(String interpreter, InterpreterRequestModel interpreterrequestmodel)
+	public StringBuilder executeScript(String interpreter, String codeToBeExecuted)
 			throws IOException, InterruptedException {
 		// Insert in the file
 		BufferedWriter writer = new BufferedWriter(new FileWriter(pathToFile, true));
-		writer.append(interpreterrequestmodel.getCode() + "\r\n");
+		writer.append(codeToBeExecuted + "\r\n");
 		writer.close();
 		// Execute All the file
-		Process p = Runtime.getRuntime().exec(interpreter+" " +pathToFile);
+		Process p = Runtime.getRuntime().exec(interpreter + " " + pathToFile);
 		p.waitFor();
 		StringBuilder resultScript = new StringBuilder();
 		// Taking the error sent by the process

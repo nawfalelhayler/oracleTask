@@ -25,17 +25,19 @@ public class InteractiveNotebookServicesImpl implements InteractiveNotebookServi
 	public InterpreterResponseModel executecommand(InterpreterRequestModel interpreterrequestmodel)
 			throws InterruptedException, IOException {
 		/*
+		 * Taking the interpreter
+		 */
+		String interpreter = commonservices.retrieveInterpreter(interpreterrequestmodel);
+		/*
 		 * Taking the command by removing %<interpreterName><whitespace> using regex
 		 * pattern
 		 */
-		String interpreter = commonservices.retrieveInterpreter(interpreterrequestmodel);
-		commonservices.commandRegex(interpreterrequestmodel);
-		
+		String codeToBeExecuted = commonservices.commandRegex(interpreterrequestmodel);
+
 		/*
-		 * Executing the Script created in the pathTofile ( the value of this variable
-		 * is outsourced in bootstrap.properties
+		 * Executing the Script created
 		 */
-		StringBuilder result = commonservices.executeScript(interpreter,  interpreterrequestmodel);
+		StringBuilder result = commonservices.executeScript(interpreter, codeToBeExecuted);
 		interpreterresponsemodel.setResult(result);
 		return interpreterresponsemodel;
 	}
